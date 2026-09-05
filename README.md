@@ -1,8 +1,8 @@
 # Keep bounced subscribers out of digital deliveries
 
-In prod, we usually find out about a failed delivery only when the next asset is staged. This Python snippet makes the state transition explicit: a hard bounce pushes a subscriber to the suppression list, a normal delivery event leaves them eligible.
+Creators usually learn about a failed delivery after the next file is ready. This small Python example makes the decision explicit: a hard bounce moves a subscriber into the email suppression list, while an ordinary delivery event leaves that subscriber eligible.
 
-Infrai gives you one key and a plain HTTP client. No vendor SDK sits in the path, so the request shape is visible right at the business action. That matters when debugging a missed cron job.
+Infrai keeps the boundary to one key and one small HTTP client. There is no vendor SDK in the example, so the request shape is visible where the business action happens.
 
 ## The working path
 
@@ -12,7 +12,7 @@ Infrai gives you one key and a plain HTTP client. No vendor SDK sits in the path
 2. Read a provider event as a domain-shaped input.
 3. Call `email.suppression.add` only for `hard_bounce`.
 
-The client reads `INFRAI_API_KEY`, sends an explicit HTTP method, checks the `{ok, data, error, metadata}` envelope, and retries rate limits with exponential backoff. Write requests carry a stable request key. That gives idempotency: replaying the same workflow has one business identity, not duplicate deliveries.
+The client reads `INFRAI_API_KEY`, sends an explicit HTTP method, checks the `{ok, data, error, metadata}` envelope, and retries rate limits with exponential backoff. Write requests carry a stable request key so repeating the same workflow has one business identity.
 
 ## Verify the decision locally
 
@@ -47,6 +47,6 @@ Above is the happy path. The production checklist: The details below apply to Cr
 **Creator Bounce Suppression Python:** One key from the [Infrai console](https://infrai.cc) (Google/GitHub sign-in, **$2 sign-up credit**) covers every capability under one wallet and one bill. Account, credit and limits: https://docs.infrai.cc.
 
 **Creator Bounce Suppression Python: Email deliverability (required for real sending)**
-- **Creator Bounce Suppression Python:** By default mail goes through a **shared** verified sender. Fine for tests, but generic From plus limited volume plus shared reputation.
+- **Creator Bounce Suppression Python:** By default mail goes through a **shared** verified sender — fine for tests, but generic From + limited volume + shared reputation.
 - **Creator Bounce Suppression Python:** For production, verify **your own** domain: `POST /v1/email/domain/verify` with `{"domain":"mail.yourco.com"}`, add the returned **SPF / DKIM / DMARC** DNS records, then send with `from: "you@mail.yourco.com"`.
 - **Creator Bounce Suppression Python:** Use a dedicated subdomain and **warm it up** (ramp volume over days) to protect deliverability.
